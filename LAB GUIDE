@@ -1,0 +1,403 @@
+===========================================================
+BGP CONCEPTS AND LAB GUIDE
+iBGP • Split Horizon • Route Reflector
+===========================================================
+
+Purpose
+-------
+
+These labs were created in Cisco CML to understand:
+
+- Basic iBGP operation
+- Loopback peering
+- Split horizon behavior
+- Full mesh requirement
+- Route reflector design
+- BGP troubleshooting
+
+Lab Progression
+---------------
+
+Lab 1 -> Basic iBGP
+
+Lab 2 -> Split Horizon + Full Mesh
+
+Lab 3 -> Route Reflector
+
+
+===========================================================
+SECTION 1 - WHAT IS BGP?
+===========================================================
+
+BGP is a path-vector routing protocol used
+to exchange routing information.
+
+Common Uses:
+
+- Internet routing
+- Enterprise WANs
+- Service Providers
+- MPLS networks
+- Data centers
+
+
+Types:
+
+eBGP:
+
+Different AS numbers
+
+
+iBGP:
+
+Same AS numbers
+
+
+===========================================================
+SECTION 2 - WHY USE LOOPBACKS?
+===========================================================
+
+Loopbacks are preferred for BGP peers.
+
+Reasons:
+
+1. Stability
+
+Loopbacks stay operational even if links fail.
+
+
+2. Multiple paths
+
+Allows alternate forwarding paths.
+
+
+3. Common enterprise design
+
+
+Requirement:
+
+Loopbacks must be reachable.
+
+
+Methods:
+
+- Static routes
+- OSPF
+- IS-IS
+- EIGRP
+
+
+Required command:
+
+neighbor X update-source loopback0
+
+
+===========================================================
+SECTION 3 - LAB 1 : BASIC iBGP
+===========================================================
+
+Objective
+---------
+
+Build first iBGP session.
+
+
+Topology
+--------
+
+R1 -------- R2
+
+
+Addressing
+----------
+
+R1:
+
+10.0.12.1/24
+
+1.1.1.1/32
+
+
+R2:
+
+10.0.12.2/24
+
+2.2.2.2/32
+
+
+Concepts Learned
+----------------
+
+- iBGP neighbors
+- Loopback peering
+- update-source
+- Verification commands
+
+
+Verification
+------------
+
+show ip bgp summary
+
+show ip bgp
+
+show ip route bgp
+
+
+Expected Result
+---------------
+
+Neighbors establish.
+
+Loopbacks exchanged.
+
+
+===========================================================
+SECTION 4 - LAB 2 : SPLIT HORIZON + FULL MESH
+===========================================================
+
+Objective
+---------
+
+Understand iBGP split horizon and
+why full mesh exists.
+
+
+Topology
+--------
+
+Physical:
+
+R1 -------- R2 -------- R3
+
+
+Split Horizon Behavior
+----------------------
+
+R1 advertises:
+
+1.1.1.1
+
+
+R2 learns:
+
+1.1.1.1
+
+
+Question:
+
+Will R2 advertise to R3?
+
+
+Answer:
+
+NO
+
+
+Reason:
+
+Routes learned from one iBGP peer
+are NOT advertised to another iBGP peer.
+
+
+Result:
+
+R3 cannot learn 1.1.1.1
+
+
+Why Full Mesh Is Needed
+-----------------------
+
+Required peerings:
+
+R1 ↔ R2
+
+R2 ↔ R3
+
+R1 ↔ R3
+
+
+This creates:
+
+Full mesh iBGP
+
+
+Session Formula
+---------------
+
+Sessions = n(n-1)/2
+
+
+3 routers:
+
+3 sessions
+
+
+10 routers:
+
+45 sessions
+
+
+Problem:
+
+Full mesh scales poorly.
+
+
+Important Rule
+--------------
+
+iBGP preserves next-hop.
+
+
+Fixes for next-hop issues:
+
+- next-hop-self
+- static routes
+- IGP reachability
+
+
+===========================================================
+SECTION 5 - LAB 3 : ROUTE REFLECTOR
+===========================================================
+
+Problem
+-------
+
+Full mesh becomes difficult to scale.
+
+
+Solution
+--------
+
+Route Reflector
+
+
+Topology
+--------
+
+        R2 (RR)
+
+       /       \
+
+R1(Client)   R3(Client)
+
+
+Operation
+---------
+
+Client sends route.
+
+RR learns route.
+
+RR reflects route.
+
+
+Result
+------
+
+Clients do not need direct peering.
+
+
+Important Command
+-----------------
+
+neighbor X route-reflector-client
+
+
+Additional Feature
+------------------
+
+cluster-id
+
+Used for loop prevention.
+
+
+===========================================================
+SECTION 6 - TROUBLESHOOTING
+===========================================================
+
+show ip bgp summary
+
+Used For:
+
+- neighbor state
+- prefixes
+- session health
+
+
+show ip bgp
+
+Used For:
+
+- next-hop
+- best path
+- route source
+
+
+show ip bgp neighbors
+
+Used For:
+
+- timers
+- capabilities
+- peer information
+
+
+show ip route bgp
+
+Used For:
+
+- installed routes
+
+
+===========================================================
+SECTION 7 - INTERVIEW QUICK REVISION
+===========================================================
+
+What is iBGP?
+
+Same AS BGP.
+
+
+Why loopbacks?
+
+Stability.
+
+
+Why update-source?
+
+Loopback peering.
+
+
+Why full mesh?
+
+Split horizon.
+
+
+Why route reflector?
+
+Scalability.
+
+
+Does iBGP change next-hop?
+
+No.
+
+
+Important RR command?
+
+neighbor X route-reflector-client
+
+
+Common issues:
+
+- wrong AS
+- missing reachability
+- missing update-source
+- next-hop unreachable
+- split horizon behavior
+
+
+===========================================================
+END
+===========================================================
