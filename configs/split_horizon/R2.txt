@@ -1,0 +1,37 @@
+hostname R2
+
+!
+! Interfaces
+!
+
+interface g0/0
+ ip address 10.0.12.2 255.255.255.0
+ no shutdown
+
+interface g0/1
+ ip address 10.0.23.2 255.255.255.0
+ no shutdown
+
+interface loopback0
+ ip address 2.2.2.2 255.255.255.255
+
+!
+! Static Routes
+!
+
+ip route 1.1.1.1 255.255.255.255 10.0.12.1
+ip route 3.3.3.3 255.255.255.255 10.0.23.3
+
+!
+! BGP
+!
+
+router bgp 65000
+
+ neighbor 1.1.1.1 remote-as 65000
+ neighbor 1.1.1.1 update-source loopback0
+
+ neighbor 3.3.3.3 remote-as 65000
+ neighbor 3.3.3.3 update-source loopback0
+
+ network 2.2.2.2 mask 255.255.255.255
