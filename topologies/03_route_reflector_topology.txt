@@ -1,0 +1,7 @@
+Topology:
+
+         R2 (Route Reflector)
+        /                   \
+   R1 (Client)         R3 (Client)
+
+AS65000
